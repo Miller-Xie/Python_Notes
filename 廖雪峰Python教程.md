@@ -362,7 +362,7 @@ tp = (a,)
 * 创建dict：
 
 ```python
-d = ['Miller':180,'Pony':175,'Tony':170]
+d = {'Miller':180,'Pony':175,'Tony':170}
 ```
 
 * 获取value的方法：
@@ -458,4 +458,155 @@ print(b)
 ```
 
 >  对于不变对象来说，调用对象自身的任意方法，也不会改变该对象自身的内容，而是创建新的对象并返回。
+>  **多任务环境**下同时读取不变对象不需要加锁，可以同时读。因此，编写程序时，尽量设计一个为不变对象。
+
+
+
+## 函数
+
+### 定义和调用函数
+
+* 定义函数：使用`def`语句
+
+* 空函数使用`pass`语句，`pass`可以用来作为占位符，比如现在还没想好怎么写函数的代码
+
+```python
+def func():
+    pass
+```
+
+* 返回多个值：实际上是返回tuple。在语法上，返回一个tuple可以省略括号，而多个变量可以同时接收一个tuple
+
+```python
+import math
+
+def move(x, y, step, angle=0):
+    nx = x + step * math.cos(angle)
+    ny = y - step * math.sin(angle)
+    return nx, ny
+
+x, y = move(100, 100, 60, math.pi / 6)
+print(x,y)
+#151.96152422706632 70.0
+```
+
+* 函数传入的参数如果进行类型检查，可以用内置函数`isinstance()`实现
+
+
+
+### 函数参数
+
+#### 位置参数
+
+* 最普通的必选参数即为位置参数。
+
+```python
+def power(x):
+    return x * x
+```
+
+对于`power(x)`函数，参数`x`就是一个位置参数。
+
+
+
+#### 默认参数
+
+当函数的某个参数大多数情况下不变的时候，可以考虑默认参数。
+
+例如，我们经常计算x<sup>2</sup>,可以将第二个参数默认设为2
+
+```
+def power(x, n=2):
+    s = 1
+    while n > 0:
+        n = n - 1
+        s = s * x
+    return s
+```
+
+**注意**：
+
+* 必选参数在前，默认参数在后
+* 当函数有多个参数时，将变化大的参数放前面，变化小的参数放后面，那么变化小的参数就可以作为默认参数
+* 默认参数的好处：降低函数调用的难度
+* 如果不按顺序提供默认参数，需要将参数名写上
+* 默认实参要使用不变对象，例如
+
+```python
+def add_end(L=[]):
+    L.append('END')
+    return L
+```
+
+对于函数`add_end`，向传入的list添加`END`，然后返回。但是多次调用`add_end()`之后，结果不正确
+
+```python
+add_end()
+#['END']
+add_end()
+#['END','END']
+```
+
+**解释**：Python函数在定义的时候，默认参数`L`的值就被计算出来了，即`[]`，因为默认参数`L`也是一个变量，它指向对象`[]`，每次调用该函数，如果改变了`L`的内容，则下次调用时，默认参数的内容就变了，不再是函数定义时的`[]`了。
+
+可以使用`None`进行改进：
+
+```python
+def add_end(L=None):
+    if L is None:
+        L = []
+    L.append('END')
+    return L
+```
+
+
+
+#### 可变参数
+
+定义：在参数前加`*`号
+
+```python
+def func(*nums):
+    sum = 0
+    for a in nums:
+        sum += a
+    return sum
+
+func(1,2)
+func(1,2,3)
+
+nums = [1,2,3]
+func(nums[0],nums[1],nums[2])
+func(*nums)
+```
+
+在函数`func`内部，参数`nums`接受的是一个tuple。在调用时，可以传入任意个参数(包括0个)，同时可以在tuple或者list前面加`*`号传给可变参数
+
+
+
+#### 关键字参数
+
+定义：关键字允许传入0个或者任意多个参数，它们在函数内部自动组成装成一个dict
+
+```python
+def func1(name,age,**k):
+    print('name:' , name , 'age:' , age , 'other:' , k)
+    
+func1('miller',23,height = 180,job = IT)
+#name: miller age: 23 other: {'height': 180}
+
+d = {'height':180}
+func1('miller',23,**d)
+#name: miller age: 23 other: {'height': 180}
+```
+
+**注意**：调用函数时，参数`k`获得一个dict，它是`d`的一份拷贝，函数内的更改不会影响`d`本身。
+
+
+
+#### 命名关键字参数
+
+
+
+#### 参数组合
 
