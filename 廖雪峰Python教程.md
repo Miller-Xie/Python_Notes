@@ -576,8 +576,10 @@ func(1,2)
 func(1,2,3)
 
 nums = [1,2,3]
+tp = (1,2,3)
 func(nums[0],nums[1],nums[2])
 func(*nums)
+func(*tp)
 ```
 
 在函数`func`内部，参数`nums`接受的是一个tuple。在调用时，可以传入任意个参数(包括0个)，同时可以在tuple或者list前面加`*`号传给可变参数
@@ -592,21 +594,82 @@ func(*nums)
 def func1(name,age,**k):
     print('name:' , name , 'age:' , age , 'other:' , k)
     
-func1('miller',23,height = 180,job = IT)
-#name: miller age: 23 other: {'height': 180}
+func1('miller',23,height = 180,job = 'IT')
+name: miller age: 23 other: {'height': 180, 'job': 'IT'}
 
 d = {'height':180}
 func1('miller',23,**d)
 #name: miller age: 23 other: {'height': 180}
 ```
 
-**注意**：调用函数时，参数`k`获得一个dict，它是`d`的一份拷贝，函数内的更改不会影响`d`本身。
+**注意**：
+
+调用函数时，参数`k`获得一个dict，它是`d`的一份拷贝，函数内的更改不会影响`d`本身。
 
 
 
 #### 命名关键字参数
 
+**定义**：相比关键字参数可以传入不受限制的关键字参数 ，命名关键字可以限制参数的名字。例如：
+
+```python
+def func2(name,age,*,city,job):
+    print('name:',name,'age:',age,'other:',city,job)
+    
+func2('Jack', 24, city='Beijing', job='Engineer')
+#name: Jack age: 24 other: Beijing Engineer
+```
+
+* 函数参数中需要一个`*`号，`*`后面的参数视为命名关键字参数
+* 如果函数参数中已经有一个可变参数，就不需要特殊分隔符`*`
+
+```python
+def func3(name,age,*args,city,job):
+    print(name,age,args,city,job)
+    
+func3('xcg',24,1,2,3,city = 'Wuhan',job = 'IT')
+#xcg 24 (1, 2, 3) Wuhan IT
+```
+
+* 命名关键字参数可以使用默认参数
+
+```python
+def func5(name,age,*args,city = 'Wuhan',job):
+    print(name,age,args,city,job)
+    
+func5('xcg',24,*(1,2,3),job = 'CS')
+#xcg 24 (1, 2, 3) Wuhan CS
+```
+
 
 
 #### 参数组合
+
+Python中定义的函数，必选参数、默认参数、可变参数、关键字参数和命名关键字参数都可以**组合**使用，但是顺序必须是：必选参数——默认参数——可变参数——命名关键字参数——关键字参数。
+
+```python
+def func5(a, b, c = 0, *args, **kw):
+    print('a =', a, 'b =', b, 'c =', c, 'args =', args, 'kw =', kw)
+
+def func6(a, b, c = 0, *args, d, **kw):
+    print(print('a =', a, 'b =', b, 'c =', c, 'args = ', args, 'd =', d, 'kw =', kw))
+
+func5(1,2,*[1,5,7],name = 'xcg',city = 'Wuhan')
+func6(1,2,*(5,8,9),name = 'xcg',age = 23,job = 'IT')
+
+"""直接调用tuple和dict"""
+args = (1, 2, 3, 4)
+kw = {'d': 99, 'x': '#'}
+func5(*args, **kw)
+#a = 1 b = 2 c = 3 args = (4,) kw = {'d': 99, 'x': '#'}
+
+args = (1, 2, 3)
+kw = {'d': 88, 'x': '#'}
+func6(*args, **kw)
+#a = 1 b = 2 c = 3 args =  () d = 88 kw = {'x': '#'}
+```
+
+
+
+## 高级特性
 
